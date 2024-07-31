@@ -4,6 +4,7 @@ This project is a CRUD of product
 
 ## Add product variant
 ## add product brand
+## add product protected
 
 ## [License](#license)
 
