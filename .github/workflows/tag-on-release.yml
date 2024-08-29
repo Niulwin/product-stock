@@ -50,5 +50,7 @@ jobs:
 
       - name: Comment on PR
         if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr comment ${{ github.event.pull_request.number }} --body "No se encontró ningún tag en los commits de este PR. Por favor, asegúrate de agregar un tag antes de fusionar."
