@@ -6,6 +6,7 @@ This project is a CRUD of product
 ## add product brand
 ## add product stock
 ## add product luis
+## add product protected bypass
 
 ## [License](#license)
 
