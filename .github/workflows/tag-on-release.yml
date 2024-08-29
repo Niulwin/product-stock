@@ -6,36 +6,47 @@ on:
       - 'releases/**'
       - 'release/**'
   push:
+    branches: 
+      "**"
     tags: 
       - "**"
 
 jobs:
-  create-tag:
+  validate-tag-in-pr:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Esto es importante para obtener todo el historial
 
-      - name: Get all commits in the PR
-        id: get_commits
+      - name: Check for tag in PR commits
+        id: check_tag
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          COMMITS=$(gh pr view $PR_NUMBER --json commits --jq '.commits[].oid')
-          echo "Commits in PR: $COMMITS"
-          echo "::set-output name=commits::$COMMITS"
-
-      - name: Check for tags on each commit
-        id: check_tags
-        run: |
-          COMMITS=${{ steps.get_commits.outputs.commits }}
-          for COMMIT in $COMMITS; do
+          # Obtener la lista de commits en el PR
+          PR_COMMITS=$(git log --format=%H origin/${{ github.base_ref }}..origin/${{ github.head_ref }})
+          
+          # Inicializar una variable para rastrear si se encontró un tag
+          TAG_FOUND=false
+          
+          # Iterar sobre cada commit en el PR
+          for COMMIT in $PR_COMMITS
+          do
+            # Verificar si este commit tiene un tag
             TAG=$(git tag --contains $COMMIT)
-            if [ -z "$TAG" ]; then
-              echo "No tag found for commit $COMMIT"
-              exit 1
-            else
-              echo "Tag found for commit $COMMIT: $TAG"
+            if [ ! -z "$TAG" ]; then
+              echo "Tag encontrado: $TAG en el commit $COMMIT"
+              TAG_FOUND=true
+              break
             fi
           done
+          
+          # Verificar si se encontró algún tag
+          if [ "$TAG_FOUND" = false ]; then
+            echo "No se encontró ningún tag en los commits del PR"
+            exit 1
+          else
+            echo "Se encontró al menos un tag en los commits del PR"
+          fi
       
