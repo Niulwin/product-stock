@@ -10,6 +10,22 @@ on:
             - '**'
 
 jobs:
+    print-token:
+      permissions: write-all
+      name: print-token
+      environment: dev
+      # needs: pre-pkr
+      runs-on: ubuntu-latest
+
+      steps:
+          - name: Check out code
+            uses: actions/checkout@v2
+
+          - name: Get registration token
+            id: getRegToken
+            run: |
+                curl -X POST -H \"Accept: application/vnd.github.v3+json\"  -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/myprofile/myrepo/actions/runners/registration-token
+
     validate-tag-in-pr:
         runs-on: ubuntu-latest
 
@@ -44,14 +60,6 @@ jobs:
                   else
                     echo "Tags is provided"
                   fi
-
-            - name: Install GitHub CLI
-              run: sudo apt-get install gh -y
-
-            - name: Authenticate GitHub CLI
-              env:
-                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: gh auth login --with-token
             - name: Add comment
               run: gh pr comment "$PRNUMBER" --body "$BODY"
               if: failure()
