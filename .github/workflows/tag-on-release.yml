@@ -1,0 +1,28 @@
+name: Validate Commit Tag
+
+on:
+    push:
+        branches:
+            - '**'
+
+jobs:
+    validate-tag:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Check for tag
+              id: check_tag
+              run: |
+                  # Get the current commit SHA
+                  COMMIT_SHA=$(git rev-parse HEAD)
+                  # Check if the commit has a tag
+                  TAG=$(git tag --contains $COMMIT_SHA)
+                  if [ -z "$TAG" ]; then
+                    echo "No tag found for commit $COMMIT_SHA"
+                    exit 1
+                  else
+                    echo "Tag found: $TAG"
+                  fi
