@@ -1,7 +1,6 @@
 name: Validate Commit Tag
 
 on:
-    
     push:
         branches:
             - '**'
@@ -18,14 +17,19 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v2
+              with:
+                node-version: '20'
 
             - name: Check for tag
               id: check_tag
               run: |
                   # Get the current commit SHA
+                  echo "entre"
                   COMMIT_SHA=$(git rev-parse HEAD)
+                  echo "despues del commit $COMMIT_SHA"
                   # Check if the commit has a tag
                   TAG=$(git tag --contains $COMMIT_SHA)
+                  echo "despues del tag $TAG"
                   if [ -z "$TAG" ]; then
                     echo "No tag found for commit $COMMIT_SHA"
                     exit 1
