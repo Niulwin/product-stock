@@ -4,6 +4,9 @@ on:
     push:
         branches:
             - '**'
+    pull_request:
+        branches:
+            - 'release/**'
 
 jobs:
     validate-tag:
@@ -25,4 +28,3 @@ jobs:
                     exit 1
                   else
                     echo "Tag found: $TAG"
-                  fi
